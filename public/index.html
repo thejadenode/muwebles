@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muwebles - Quality Tables and Chairs</title>
+  <link rel="icon" href="images/logo.png"/>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+
+  <!-- JQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Firebase -->
+  <script defer src="/__/firebase/9.8.3/firebase-app-compat.js"></script>
+  <script defer src="/__/firebase/9.8.3/firebase-auth-compat.js"></script>
+  <script defer src="/__/firebase/9.8.3/firebase-firestore-compat.js"></script>
+
+  <!-- Local links -->
+  <script src="scripts/script.js"></script>
+  <script src="scripts/firebase.js"></script>
+  <link rel="stylesheet" href="styles/utilities.css">
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<nav></nav>
+
+<body>
+  <!-- Banner -->
+  <div class="container d-flex p-5 index-banner">
+    <div class="row align-items-center pe-5">
+      <div class="col">
+        <img src="images/homepage_chair.jpg" class="img-fluid" alt="">
+      </div>
+      <div class="col">
+        <div class="row index-title d-flex justify-content-end text-color-secondary fs-1">Filled with Culture,</div>
+        <div class="row d-flex justify-content-end index-title text-color-primary fs-1">Made with Passion.</span></div>
+        <div class="row ps-5 ms-5 index-banner-subtext d-flex justify-content-end text-end fs-5">High quality wooden tables
+          and chairs <br> at a very affordable price</div>
+        <div class="row justify-content-end mt-2">
+          <button class="button-primary" type="button" onclick="window.location.assign('shop.html')">Shop
+            Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured -->
+  <div class="container mb-">
+    <div class="divider fw-bold fs-5 p-2">Featured Products</div>
+    <div id="featuredProducts-container" class="row my-5 d-flex justify-content-center align-items-center">
+      <!-- This is where Firebase populates featured products -->
+    </div>
+    <div class="divider container mb-3"></div>
+  </div>
+
+  <!-- About -->
+  <div class="container mb-5 ps-5">
+    <div class="row">
+      <div class="col-6 pe-5">
+        <div class="row index-title text-color-secondary fs-3 fw-bold">Who are we?</div>
+        <div class="row index-description text-color-secondary fs-5">
+          The Philippine Archipelago, composed of 7,641 islands, is home for a large variety of trees. As a tropical
+          country, this is not a surprise. History can tell that we have utilized our trees with such skill, which is
+          very evident by the different designs of bahay-kubos or what we call as Nipa Huts.
+          <br><br>
+          And it’s not just the exterior of our houses! We have also been using our local trees as materials in making
+          furniture such as beds, tables, and chairs. Why wouldn’t we? It’s very durable and is abundant in our
+          surroundings. It’s very durable that in the earlier times, it was even used for kalesas, which are mainly used
+          for transportation! Imagine the stress and everyday load of those kalesas, and how strong the woods are to be
+          able to withstand those.
+          <br><br>
+          We focused our business on showcasing our local tables and chairs made from our
+          finest woods to preserve the
+          culture that we had since before. Along the furniture are intricate design patterns made by our very own
+          furniture makers which you’ll surely love.
+          <br><br>
+          With your efforts and support, you won’t just be acquiring such preciously natural and locally made tables and
+          chairs, but you will also be helping the local furniture industry, as well as giving new jobs, and sustaining
+          old ones.
+        </div>
+      </div>
+      <div class="col-6">
+        <div id="home-carousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="images/manufacturer1.jpeg" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+              <img src="images/manufacturer2.jpeg" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+              <img src="images/manufacturer3.jpeg" class="d-block w-100" alt="...">
+            </div>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#home-carousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#home-carousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-center m-5">
+      <button class="button-primary" type="button" onclick="window.location.assign('shop.html')">Shop Now</button>
+    </div>
+  </div>
+</body>
+
+<script>
+  $(document).on("FirebaseInitialized", () => {
+    firebase.firestore().collection('items').where("isFeatured", "==", Boolean(true)).onSnapshot((querySnapshot) => {
+      $('#featuredProducts-container').empty();
+      querySnapshot.forEach((doc) => {
+        var prod = {
+          category: doc.data().category,
+          description: doc.data().description,
+          isFeatured: doc.data().isFeatured,
+          name: doc.data().name,
+          price: doc.data().price,
+          rating: doc.data().rating,
+          type: doc.data().type,
+          id: doc.id
+        }
+
+        addProductCard(prod, "#featuredProducts-container");
+
+      })
+    })
+  })
+</script>
+
+<footer></footer>
+
+</html>

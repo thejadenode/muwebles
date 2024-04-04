@@ -1,0 +1,53 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow px-5">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">
+      <img src="images/logo.png" class="img-fluid me-2" style="max-height: 40px;" alt="">
+      <span class="fw-bold text-color-primary">Muwebles</span>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
+        <li class="nav-item me-3">
+          <a class="nav-link active fw-bold text-color-primary" aria-current="page" href="shop.html">
+            <i class="fa-solid fa-shop text-color-primary"></i>
+            <span class="text-color-primary fw-bold">Shop</span>
+          </a>
+        </li>
+        <li class="nav-item me-3">
+          <a id="nav-user-orders" class="nav-link active fw-bold text-color-primary" aria-current="page"
+            href="orders.html">
+            <i class="fa-solid fa-receipt text-color-primary"></i>
+            <span class="text-color-primary fw-bold">Orders</span>
+          </a>
+        </li>
+        <li class="nav-item me-3">
+          <a id="nav-user-cart" class="nav-link active fw-bold text-color-primary" aria-current="page" href="cart.html">
+            <i class="fa-solid fa-shopping-basket text-color-primary"></i>
+            <span class="text-color-primary fw-bold">Cart</span>
+          </a>
+        </li>
+        <li class="nav-item dropstart">
+          <a class="nav-link dropdown" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            <i class="fa-solid fa-user text-color-primary"></i>
+            <span class="text-color-primary fw-bold" id="nav-username">Account</span>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li id="nav-user-admin"><a class="dropdown-item" href="adminConsole.html">Admin Console</a></li>
+            <li id="nav-user-signIn"><a class="dropdown-item" href="login.html">Sign In</a></li>
+            <li id="nav-user-account"><a class="dropdown-item" href="account.html">Account</a></li>
+            <li id="nav-user-divider">
+              <hr class="dropdown-divider">
+            </li>
+            <li id="nav-user-signOut"><a class="dropdown-item" onclick="signOut()">Sign Out</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

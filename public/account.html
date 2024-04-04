@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muwebles</title>
+  <link rel="icon" href="images/logo.png"/>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+
+  <!-- JQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Firebase -->
+  <script defer src="/__/firebase/9.8.3/firebase-app-compat.js"></script>
+  <script defer src="/__/firebase/9.8.3/firebase-auth-compat.js"></script>
+  <script defer src="/__/firebase/9.8.3/firebase-firestore-compat.js"></script>
+
+  <!-- Local links -->
+  <script src="scripts/script.js"></script>
+  <script src="scripts/firebase.js"></script>
+  <link rel="stylesheet" href="styles/utilities.css">
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<nav></nav>
+
+<body>
+  <div class="container-fluid content">
+    <!-- Section -->
+    <div class="row bg-red content-container center">
+      <span class="content-container-header">Account</span>
+      <div class="row content-section">
+        <span class="content-section-title">Personal Details</span>
+        <div class="mb-3 col-auto">
+          <label for="input-firstName" class="form-label">First Name</label>
+          <input type="text" class="form-control" id="input-firstName">
+        </div>
+        <div class="mb-3 col-auto">
+          <label for="input-lastName" class="form-label">Last Name</label>
+          <input type="text" class="form-control" id="input-lastName">
+        </div>
+        <div class="mb-3 col-auto">
+          <label for="input-contact" class="form-label">Contact Number</label>
+          <input type="number" class="form-control" id="input-contact">
+        </div>
+        <div class="mb-3 col-auto">
+          <label for="input-address" class="form-label">Home Address</label>
+          <input type="text" class="form-control" id="input-address">
+        </div>
+        <div class="col-auto">
+          <label for="exampleInputEmail1" class="form-label text-danger">&nbsp</label>
+          <button class="form-control bg-primary text-white fw-bold" type="submit"
+            onclick="btnSetUserDetails_clicked()">Update details</button>
+        </div>
+      </div>
+
+      <div class="row content-section">
+        <span class="content-section-title">Login Details</span>
+        <div class="mb-3 col-auto">
+          <label for="input-email" class="form-label">Email</label>
+          <input disabled type="email" class="form-control" id="input-email">
+        </div>
+        <div class="row"></div>
+        <div class="mb-3 col-auto">
+          <label for="input-password-current" class="form-label">Current Password</label>
+          <input type="password" class="form-control" id="input-password-current">
+        </div>
+        <div class="mb-3 col-auto">
+          <label for="input-password" class="form-label">New Password</label>
+          <input type="password" class="form-control" id="input-password">
+        </div>
+        <div class="mb-3 col-auto">
+          <label for="input-password-confirm" class="form-label">Confirm Password</label>
+          <input type="password" class="form-control" id="input-password-confirm">
+        </div>
+        <div class="col-auto">
+          <label for="exampleInputEmail1" class="form-label text-danger" id="error">&nbsp</label>
+          <button class="form-control bg-primary text-white fw-bold" type="submit"
+            onclick="btnChangePassword_clicked()">Change Password</button>
+        </div>
+      </div>
+
+      <!-- <div class="row content-section">
+        <span class="content-section-title">Account Deletion</span>
+
+        <div class="col-auto">
+          <label for="exampleInputEmail1" class="form-label text-danger" id="error">Be careful when deleting your account. It cannot be retrieved.</label>
+          <button class="form-control button-red text-white fw-bold" type="button" onclick="deleteAccount()">Delete Account</button>
+        </div>
+      </div> -->
+    </div>
+  </div>
+</body>
+
+<script>
+  if (!localStorage.getItem('isLoggedIn') == 'true' || localStorage.getItem('isLoggedIn') === null) window.location.href = 'login.html';
+
+  $(document).on("FirebaseUserLoaded", function (event, user, userDetails) {
+    console.log(userDetails);
+    $('#input-firstName').val(userDetails.firstName);
+    $('#input-lastName').val(userDetails.lastName);
+    $('#input-email').val(user.email);
+    $('#input-contact').val(userDetails.contact);
+    $('#input-address').val(userDetails.address);
+    console.log(userDetails.isAdmin)
+
+    firebase.firestore().collection('orders').where('userId', '==', firebase.auth().currentUser.uid).onSnapshot((querySnapshot) => {
+      querySnapshot.forEach((query) => {
+        var trow = $('<tr>',);
+        var orderId = $('<th>', { scope: 'row', text: query.id });
+        var orderTotal = $('<th>', { text: query.data().totalAmount });
+        var orderMethod = $('<th>', { text: query.data().paymentMethod });
+        var orderState = $('<th>', { text: query.data().orderState });
+
+        $(trow).append(orderId).append(orderTotal).append(orderMethod).append(orderState);
+
+        $('#order-container').append(trow);
+      })
+    })
+  })
+
+  function btnSetUserDetails_clicked() {
+    firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set(({
+      firstName: $('#input-firstName').val(),
+      lastName: $('#input-lastName').val(),
+      contact: $('#input-contact').val(),
+      address: $('#input-address').val(),
+    })).then(() => {
+      alert("Successfuly updated user details");
+    })
+  }
+
+  function btnChangePassword_clicked() {
+    if (!$('#input-password-current').val() || !$('#input-password').val() || !$('#input-password-confirm').val()) {
+      $('#error').text("Please complete all fields");
+    } else if ($('#input-password').val() == $('#input-password-confirm').val()) {
+      updateUserPassword($('#input-password-confirm').val());
+    } else {
+      $('#error').text("Passwords do not match.");
+    }
+  }
+</script>
+
+<footer></footer>
+
+</html>

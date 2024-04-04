@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muwebles - Cart</title>
+  <link rel="icon" href="images/logo.png"/>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+
+  <!-- JQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Firebase -->
+  <script defer src="/__/firebase/9.8.3/firebase-app-compat.js"></script>
+  <script defer src="/__/firebase/9.8.3/firebase-auth-compat.js"></script>
+  <script defer src="/__/firebase/9.8.3/firebase-firestore-compat.js"></script>
+
+  <!-- Local links -->
+  <script src="scripts/script.js"></script>
+  <script src="scripts/firebase.js"></script>
+  <link rel="stylesheet" href="styles/utilities.css">
+  <link rel="stylesheet" href="styles/style.css">
+
+  <!-- Paypal -->
+  <script
+    src="https://www.paypal.com/sdk/js?client-id=AStK9Rsx5XgKR6cy9yK9y78vuk0q5l7kRjlcoBRG7p9LQtxkj3BWj0AK3Vn_XBwj2ja0fCz_DgCj_sOO&currency=PHP"></script>
+  <script src="scripts/paypal.js"></script>
+</head>
+
+<nav></nav>
+
+<body>
+  <div class="container-fluid content bg-white">
+    <div class="row fw-bold fs-5">
+      Your cart
+    </div>
+    <div class="row justify-content-between bg-white p-3">
+      <div class="col-8">
+        <div class="row">
+
+        </div>
+        <hr>
+        <!-- Item -->
+        <div id="cart-items-container" class="container">
+
+        </div>
+        <hr>
+      </div>
+      <!-- Summary and checkout -->
+      <div class="col-4 px-5">
+        <!-- Personal Details -->
+        <div class="row fw-bold">Personal Details</div>
+        <div class="row pb-2">
+          <div class="col">
+            <i class="fa-solid fa-location-dot"></i>
+            Address
+          </div>
+          <div class="col-auto justify-content-end" id="userDetails-address">Address</div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <i class="fa-solid fa-phone"></i>
+            Contact
+          </div>
+          <div class="col-auto justify-content-end" id="userDetails-contact">xxxxxxxxxxx</div>
+        </div>
+
+        <hr>
+        <!-- Order Summary -->
+        <div class="row fw-bold">Order Summary</div>
+        <div class="row">
+          <div class="col" id="summaryDetails-itemCount"></div>
+          <div class="col-auto justify-content-end" id="summaryDetails-subtotal"></div>
+        </div>
+        <div class="row">
+          <div class="col">Shipping cost</div>
+          <div class="col-auto justify-content-end" id="summaryDetails-shippingFee">₱50</div>
+        </div>
+        <div class="row">
+          <div class="col">Total</div>
+          <div class="col-auto justify-content-end fw-bold" id="summaryDetails-total"></div>
+        </div>
+        <div class="spacer-50"></div>
+        <div class="row justify-content-center fw-light mb-1">Proceed with</div>
+
+        <div class="row mb-3" id="paypal-button-container"></div>
+        <div class="row">
+          <button class="button-paymentMethod rounded border-1 my-1 bg-white border-blue" type="submit"
+            onclick="btnGcash_clicked()"><img src="images/gcash-logo.png" alt=""></button>
+          <button class="button-paymentMethod border border-2 rounded my-1" type="submit"
+            onclick="finalizeTransaction('COD')">Cash on Delivery (COD)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script>
+  $(document).ready(() => {
+
+  })
+
+  localStorage.setItem('transactionState', 'none');
+
+  window.addEventListener("storage", (e) => {
+    if (localStorage.getItem('transactionState') == 'success') {
+      finalizeTransaction();
+    }
+  });
+
+  $(document).on("FirebaseUserLoaded", function (event, user, userDetails) {
+    firebase.firestore().collection('users').doc(user.uid).get().then((doc) => {
+      $('#userDetails-contact').text(doc.data().contact);
+      $('#userDetails-address').text(doc.data().address);
+    })
+
+    loadCart(user);
+  })
+
+  function btnGcash_clicked() {
+    window.open('templates/gcash.html', 'WindowName', "height=600, width=500")
+  }
+
+  function finalizeTransaction(paymentMethod) {
+    if (!paymentMethod) paymentMethod = localStorage.getItem('paymentMethod')
+    addOrder(paymentMethod, getTotal())
+    localStorage.setItem('transactionState', 'none');
+    localStorage.removeItem('paymentMethod');
+  }
+
+  function loadCart(user) {
+    var itemCount = 0;
+    firebase.firestore().collection('users').doc(user.uid).collection('cart').onSnapshot((querySnapshot) => {
+      $('#cart-items-container').empty()
+      querySnapshot.forEach((cartItem) => {
+        itemCount++;
+        firebase.firestore().collection('items').doc(cartItem.data().id).get().then((doc) => {
+
+          var row = $('<div>', { class: 'row my-1' });
+          var product_image_container = $('<div>', { class: 'col-2' });
+          var product_image = $('<img>', { class: 'img-fluid' });
+          $(product_image_container).append(product_image);
+
+          var product_details_container = $('<div>', { class: 'col-3' });
+          var product_name = $('<div>', { class: 'row fw-bold', text: doc.data().name });
+          var product_type = $('<div>', { class: 'row', text: doc.data().type });
+          $(product_details_container).append(product_name);
+          $(product_details_container).append(product_type);
+
+          var product_price_indiv = $('<div>', { class: 'col-2 fw-bold text-center', text: '₱' + doc.data().price });
+
+          var product_qty_container = $('<div>', { class: 'col-2' });
+          var product_qty = $('<input>', { class: 'container-fluid', type: 'number', value: 1, min: '1' });
+          $(product_qty_container).append(product_qty);
+
+          var product_price_subtotal = $('<div>', { class: 'col-2 text-center cartItemSubtotal', text: '₱' + doc.data().price * $(product_qty).val() });
+
+          var product_removeBtn_container = $('<div>', { class: 'col-1 button-trash d-flex justify-content-center' });
+          var product_removeBtn = $('<i>', { class: 'fa-solid fa-trash text-center', style: 'color: gray' });
+          $(product_removeBtn_container).append(product_removeBtn);
+          $(product_removeBtn_container).on('click', () => { removeFromCart(cartItem) })
+
+          $(row).append(product_image_container);
+          $(row).append(product_details_container);
+          $(row).append(product_price_indiv);
+          $(row).append(product_qty_container);
+          $(row).append(product_price_subtotal);
+          $(row).append(product_removeBtn_container);
+
+          $(product_qty).on('click keyup', () => {
+            $(product_price_subtotal).text('₱' + doc.data().price * $(product_qty).val());
+          })
+
+          $('#cart-items-container').append(row);
+
+          firebase.storage().ref('prodImg/' + doc.id).getDownloadURL().then((url) => { $(product_image).attr('src', url) });
+          calculateSubtotal();
+
+          $('input').on('click keyup', () => {
+            calculateSubtotal();
+          })
+
+        });
+      })
+      if (querySnapshot.empty) {
+        var div = $('<div>', { class: 'fw-light d-flex justify-content-center align-items-center', style: 'min-height: 100px', text: 'Your cart is empty!' });
+        $('#cart-items-container').append(div);
+        var div = $('<i>', { class: 'fa-solid fa-trash text-center', style: 'color: gray' });
+      }
+      $('#summaryDetails-itemCount').text('Subtotal (' + itemCount + ' item/s):');
+      calculateSubtotal();
+    })
+  }
+
+  function calculateSubtotal() {
+    var cartSubtotal = 0;
+    $('.cartItemSubtotal').each(function () {
+      cartSubtotal += parseInt($(this).text().substring(1, $(this).text().length));
+    })
+
+    $('#summaryDetails-subtotal').text('₱' + cartSubtotal);
+    calculateTotal();
+  }
+
+  function calculateTotal(){
+    var cartTotal = 0;
+    cartTotal += parseInt($('#summaryDetails-shippingFee').text().substring(1, $('#summaryDetails-shippingFee').text().length));
+    cartTotal += parseInt($('#summaryDetails-subtotal').text().substring(1, $('#summaryDetails-subtotal').text().length));
+    $('#summaryDetails-total').text('₱' + cartTotal);
+  }
+
+  function getTotal(){
+    return $('#summaryDetails-total').text().substr(1, $('#summaryDetails-total').text().length);
+  }
+</script>
+
+<footer></footer>
+
+</html>

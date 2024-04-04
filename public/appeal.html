@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muwebles - Return package</title>
+  <link rel="icon" href="images/logo.png" />
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+
+  <!-- JQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Firebase -->
+  <script defer src="/__/firebase/9.8.3/firebase-app-compat.js"></script>
+  <script defer src="/__/firebase/9.8.3/firebase-auth-compat.js"></script>
+  <script defer src="/__/firebase/9.8.3/firebase-firestore-compat.js"></script>
+
+  <!-- Local links -->
+  <script src="scripts/script.js"></script>
+  <script src="scripts/firebase.js"></script>
+  <link rel="stylesheet" href="styles/utilities.css">
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<nav></nav>
+
+
+<body>
+  <div class="content d-flex align-items-center">
+    <div class="container text-center">
+      <div class="row mb-5">
+        <span class="fw-bold fs-1 text-color-primary">What would you like to appeal for?</span>
+      </div>
+      <div class="row w-50 m-auto d-flex justify-content-center align-items-center">
+        <select name="" id="input-appeal-type">
+          <option name="input-appeal-option" value="Package delayed">I have been waiting for too long</option>
+          <option name="input-appeal-option" value="Damaged package">Package is damaged upon receiving</option>
+          <option name="input-appeal-option" value="Received unexpected">Received something I did not oder</option>
+          <option name="input-appeal-option" value="Return and refund">I want to return the package and get a refund
+          </option>
+        </select>
+      </div>
+
+      <div class="m-5 d-flex justify-content-center">
+        <form id="form-appeal" hidden class="w-50 text-start">
+          <div class="mb-3">
+            <label class="form-check-label" for="input-orderId">Appeal for</label>
+            <input disabled type="text" class="form-control" id="input-orderId">
+          </div>
+          <div class="mb-3">
+            <label for="input-fullName" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="input-fullName" aria-describedby="emailHelp">
+          </div>
+          <div class="mb-3">
+            <label for="input-email" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="input-email" aria-describedby="emailHelp">
+          </div>
+          <div class="mb-3">
+            <label for="input-contact" class="form-label">Contact Number</label>
+            <input type="number" class="form-control" id="input-contact">
+          </div>
+          <div class="form-group">
+            <label for="input-comment">Comment</label>
+            <textarea class="form-control" name="input-comment" id="input-comment" rows="4"></textarea>
+          </div>
+          <div class="row w-25 m-auto d-flex justify-content-center align-items-center">
+            <label for="exampleInputEmail1" class="form-label text-danger" id="error">&nbsp</label>
+            <button class="form-control bg-primary text-white fw-bold" type="button" onclick="btnAppeal_clicked()">Send
+              appeal</button>
+          </div>
+        </form>
+      </div>
+
+
+    </div>
+  </div>
+</body>
+
+<script>
+  var formHidden = true;
+  if (localStorage.getItem('orderIdToAppeal') === null) window.location.href = 'orders.html';
+
+  $(document).ready(() => {
+    $('#input-orderId').val(localStorage.getItem('orderIdToAppeal'))
+
+    $('#form-appeal').hide();
+    $('#form-appeal').removeAttr('hidden');
+
+
+    $('#input-appeal-type').on('click', () => {
+      if (formHidden) {
+        formHidden = false;
+        $('#form-appeal').show(1500);
+      }
+    })
+  })
+
+  $(document).on("FirebaseUserLoaded", function (event, user, userDetails) {
+    $('#input-fullName').val(userDetails.firstName + ' ' + userDetails.lastName)
+    $('#input-email').val(user.email)
+    $('#input-contact').val(userDetails.contact)
+  });
+
+  function btnAppeal_clicked() {
+    var appeal = {
+      orderId: $('#input-orderId').val(),
+      fullName: $('#input-fullName').val(),
+      email: $('#input-email').val(),
+      contact: $('#input-contact').val(),
+      comment: $('#input-comment').val(),
+      description: $('#input-appeal-type option:selected').val()
+    }
+    addAppeal(appeal)
+  }
+</script>
+
+<footer></footer>
+
+</html>

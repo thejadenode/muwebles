@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Products</title>
+    <link rel="icon" href="images/logo.png" />
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <!-- Local links -->
+    <script src="../scripts/script.js"></script>
+    <script src="../scripts/firebase.js"></script>
+    <link rel="stylesheet" href="../styles/utilities.css">
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+
+<body>
+    <div class="container d-flex justify-content-center">
+        <!-- Section -->
+        <div class="row enter">
+            <div class="col-md-4">
+                <div class="row">
+                    <span class="content-container-header text-color-primary">Add Product</span>
+
+                    <span class="content-section-header mt-4">Product Name</span>
+                    <input class="form-control" type="text" id="input-product-name">
+
+                    <span class="content-section-header mt-4">Category</span>
+                    <select class="form-select" id="input-product-category"></select>
+
+                    <span class="content-section-header mt-4">Type</span>
+                    <select class="form-select dropdown-toggle" id="input-product-type"></select>
+
+                    <span class="content-section-header mt-4">Description</span>
+                    <input class="form-control" type="text" id="input-product-description">
+
+                    <span class="content-section-header mt-4">Price</span>
+                    <input class="form-control" type="number" id="input-product-price">
+
+                    <span class="content-section-header mt-4">Rating</span>
+                    <input class="form-control" type="number" min=1 max=5 id="input-product-rating">
+
+                    <span class="content-section-header mt-4">Date Registered</span>
+                    <input class="form-control" type="date" id="dateRegistered">
+
+                    <span class="content-section-header mt-4">Product Image</span>
+                    <input class="form-control" type="file" id="input-product-image">
+
+                    <div class="mt-4 p-0 justify-content-center d-flex">
+                        <button class="form-control bg-primary text-white fw-bold" onclick="addProduct()">Add Product</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col col-1"></div>
+
+            <div class="col-md-7">
+                <div class="row">
+                    <span class="content-container-header text-color-primary">Products</span>
+                <div class="col" id="products-container"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+<script>
+    var firebaseUserLoaded = false;
+    $(document).on("FirebaseUserLoaded", function (event, user, userDetails) {
+        firebaseUserLoaded = true;
+
+
+        firebase.firestore().collection('items').onSnapshot((collection) => {
+            var source = collection.metadata.hasPendingWrites ? "Local" : "Server";
+
+        });
+
+        loadProducts();
+        loadItemGroups();
+    })
+
+    function loadItemGroups() {
+        var categoryList = [];
+        firebase.firestore().collection('item-categories').onSnapshot((querySnapshot) => {
+            // Reset options and category array
+            $('#input-product-category').empty();
+            $('#input-product-type').empty();
+            categoryList.length = 0;
+
+
+            querySnapshot.forEach((query) => {
+                // Populate category
+                if (!categoryList.includes(query.data().category)) {
+                    var tempCategory = $('<option>', { text: query.data().category, value: query.data().category });
+                    $('#input-product-category').append(tempCategory);
+                    categoryList.push(query.data().category);
+                }
+
+                var tempType = $('<option>', { text: query.data().type, value: query.data().type });
+                $('#input-product-type').append(tempType);
+
+            })
+        })
+    }
+
+    function addProduct() {
+        if (!firebaseUserLoaded) return;
+        var prodId = firebase.firestore().collection('items').doc().id;
+
+
+        firebase.firestore().collection('items').doc(prodId).set(({
+            category: $('#input-product-category').val(),
+            description: $('#input-product-description').val(),
+            name: $('#input-product-name').val(),
+            price: parseInt($('#input-product-price').val()),
+            rating: parseInt($('#input-product-rating').val()),
+            type: $('#input-product-type').val(),
+        })).then(() => {
+
+        }).catch(() => {
+
+        })
+
+        firebase.storage().ref().child('prodImg/' + prodId).put($('#input-product-image')[0].files[0]).then(() => {
+
+        });
+    }
+
+    function loadProducts() {
+        firebase.firestore().collection('items').onSnapshot((querySnapshot) => {
+            $('#products-container').empty()
+            querySnapshot.forEach((doc) => {
+                //For each item in Firestore cart, populate items to web cart
+                var row = $('<div>', { class: 'row content-table-item' });
+                var product_id = $('<input>', { type: "hidden", value: doc.id });
+
+                var product_image_container = $('<div>', { class: 'col col-2 text-center d-flex justify-content-center align-items-center' });
+                var product_image = $('<img>', { src: "", height: "100px" });
+                $(product_image_container).append(product_image);
+
+                var product_name = $('<div>', { class: 'col col-2 text-center d-flex justify-content-center align-items-center', text: doc.data().name });
+                var product_category = $('<div>', { class: 'col col-2 text-center d-flex justify-content-center align-items-center', text: doc.data().category });
+                var product_type = $('<div>', { class: 'col col-2 text-center d-flex justify-content-center align-items-center', text: doc.data().type });
+                var product_price = $('<div>', { class: 'col col-2 text-center d-flex justify-content-center align-items-center', text: doc.data().price });
+
+                var product_button_container = $('<div>', { class: 'col col-2 text-center d-flex justify-content-center align-items-center' });
+                var product_button = $('<button>', { class: 'view-button form-control bg-primary text-white fw-bold', type: 'button', text: 'Remove' });
+                $(product_button).click(() => removeProduct(doc))
+                $(product_button_container).append(product_button);
+
+                $(row).append(product_image_container);
+                $(row).append(product_name);
+                $(row).append(product_category);
+                $(row).append(product_type);
+                $(row).append(product_price);
+                $(row).append(product_button_container);
+
+                firebase.storage().ref('prodImg/' + doc.id).getDownloadURL().then((url) => { $(product_image).attr('src', url) });
+
+                $('#products-container').append(row);
+            })
+        })
+    }
+
+    function removeProduct(doc) {
+        firebase.firestore().collection('items').doc(doc.id).delete().then(() => {
+
+        }).catch(() => {
+
+        })
+    }
+</script>
+
+</html>

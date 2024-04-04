@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Featured Products</title>
+    <link rel="icon" href="images/logo.png" />
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <!-- Firebase -->
+    <script defer src="/__/firebase/9.8.3/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/9.8.3/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/9.8.3/firebase-firestore-compat.js"></script>
+
+    <!-- Local links -->
+    <script src="../scripts/script.js"></script>
+    <script src="../scripts/firebase.js"></script>
+    <link rel="stylesheet" href="../styles/utilities.css">
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+
+
+<body>
+    <div class="container-fluid content">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row p-0 m-0 content-section">
+                    <span class="content-section-title text-color-primary">Search by product name</span>
+                    <div class="mb col-12">
+                        <input type="email" class="form-control" id="searchbar" aria-describedby="emailHelp">
+                    </div>
+                    <table class="table">
+                        <thead class="table text-color-primary">
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </thead>
+                        <tbody id="products-container"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <table class="table">
+                    <thead class="table text-color-primary">
+                        <th scope="col">Image</th>
+                        <th scope="col">Item Name</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Price</th>
+                        <th scope="col"></th>
+                    </thead>
+                    <tbody id="featuredProducts-container"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    var isFirebaseInitialized = false;
+    $(document).on("FirebaseInitialized", () => {
+        isFirebaseInitialized = true;
+        updateSearchQuery();
+        loadProducts();
+    })
+
+    function updateSearchQuery() {
+        $("#products-container").empty();
+        const queryProducts = [];
+        var query = $('#searchbar').val().toLowerCase();
+        if (isFirebaseInitialized && query.length > 0) {
+            firebase.firestore().collection('items').get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+
+                    var found = false;
+                    for (var i = 0; (i < doc.data().name.length) && !found; i++) {
+
+                        if ((doc.data().name).substring(i, i + query.length).toLowerCase() == query && !queryProducts.includes(doc.id)) {
+                            //For each item in Firestore cart, populate items to web cart
+                            var trow = $('<tr>', {});
+                            var product_id = $('<input>', { type: "hidden", value: doc.id });
+
+                            var product_image_container = $('<td>', { class: 'w-25' });
+                            var product_image = $('<img>', { src: "", class: 'img-fluid' });
+                            $(product_image).css('min-height', '100px');
+                            $(product_image_container).append(product_image);
+
+                            var product_name = $('<td>', { text: doc.data().name });
+                            var product_category = $('<td>', { text: doc.data().category });
+                            var product_type = $('<td>', { text: doc.data().type });
+                            var product_price = $('<td>', { text: doc.data().price });
+
+                            var product_button_container = $('<td>');
+                            var product_button = $('<button>', { class: 'form-control bg-primary text-white fw-bold', type: 'button', text: 'Feature' });
+                            $(product_button).click(() => setFeature(doc, true))
+                            $(product_button_container).append(product_button);
+
+                            $(trow).append(product_image_container).append(product_name).append(product_category).append(product_type).append(product_price).append(product_button_container);
+
+                            firebase.storage().ref('prodImg/' + doc.id).getDownloadURL().then((url) => { $(product_image).attr('src', url) });
+
+                            $('#products-container').append(trow);
+                            queryProducts.push(doc.id);
+                            found = true;
+                        }
+                    }
+
+                })
+            })
+        }
+    }
+
+    function loadProducts() {
+        firebase.firestore().collection('items').where('isFeatured', '==', Boolean(true)).onSnapshot((querySnapshot) => {
+            clearTables();
+            querySnapshot.forEach((doc) => {
+                var trow = $('<tr>', {});
+                var product_id = $('<input>', { type: "hidden", value: doc.id });
+
+                var product_image_container = $('<td>', { class: 'w-25' });
+                var product_image = $('<img>', { src: "", class: 'img-fluid' });
+                $(product_image).css('min-height', '100px');
+                $(product_image_container).append(product_image);
+
+                var product_name = $('<td>', { text: doc.data().name });
+                var product_category = $('<td>', { text: doc.data().category });
+                var product_type = $('<td>', { text: doc.data().type });
+                var product_price = $('<td>', { text: doc.data().price });
+
+                var product_button_container = $('<td>');
+                var product_button = $('<button>', { class: 'form-control bg-primary text-white fw-bold', type: 'button', text: 'Unfeature' });
+                $(product_button).click(() => setFeature(doc, false))
+                $(product_button_container).append(product_button);
+
+                $(trow).append(product_image_container).append(product_name).append(product_category).append(product_type).append(product_price).append(product_button_container);
+
+                firebase.storage().ref('prodImg/' + doc.id).getDownloadURL().then((url) => { $(product_image).attr('src', url) });
+
+                $('#featuredProducts-container').append(trow);
+            })
+        })
+    }
+
+    var x_timer;
+    $('#searchbar').on("keyup", () => {
+        clearTimeout(x_timer);
+        x_timer = setTimeout(function () {
+
+            updateSearchQuery();
+        }, 500)
+    });
+
+    function clearTables() {
+        $('#featuredProducts-container').empty();
+        $('#products-container').empty();
+    }
+
+    function setFeature(doc, value) {
+        firebase.firestore().collection('items').doc(doc.id).update({ isFeatured: Boolean(value) });
+    }
+</script>
+
+</html>

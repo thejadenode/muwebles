@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Appeals</title>
+    <link rel="icon" href="images/logo.png" />
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <!-- Firebase -->
+    <script defer src="/__/firebase/9.8.3/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/9.8.3/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/9.8.3/firebase-firestore-compat.js"></script>
+
+    <!-- Local links -->
+    <script src="../scripts/script.js"></script>
+    <script src="../scripts/firebase.js"></script>
+    <link rel="stylesheet" href="../styles/utilities.css">
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+
+<body>
+    <div class="container-fluid" id="appeal-container">
+    </div>
+</body>
+
+<script>
+    $(document).on('FirebaseInitialized', () => {
+        firebase.firestore().collection('appeals').onSnapshot((querySnapshot) => {
+            $('#appeal-container').empty();
+            querySnapshot.forEach((doc) => {
+                var row = $('<div>', { class: 'row m-3 border p-3' });
+
+                var header = $('<div>', { class: 'row mb-5 d-flex justify-content-between' });
+                $(header).append(appealId).append(orderId).append(userId).append(description)
+
+                var detailsContainer = $('<div>', { class: 'col-md-auto' });
+                var description = $('<div>', { class: 'row fw-bold fs-3 text-color-primary', text: doc.data().description });
+                var appealId = $('<div>', { class: 'row fw-light', text: 'Appeal #' + doc.id });
+                var orderId = $('<div>', { class: 'row fw-light', text: 'on order #' + doc.data().orderId });
+                var userId = $('<div>', { class: 'row fw-light', text: 'by user #' + doc.data().userId });
+
+                $(detailsContainer).append(description).append(appealId).append(orderId).append(userId)
+                var btnSettleContainer = $('<div>', { class: 'col-md-auto d-flex' });
+                var btnSettle = $('<button>', { class: 'm-auto form-control bg-primary text-white fw-bold', text: 'Mark as settled' });
+
+                if (doc.data().appealStatus == 'Settled') {
+                    $(btnSettle).text('Settled');
+                    $(btnSettle).attr('disabled', true);
+                    $(btnSettle).removeClass('bg-primary text-white').addClass('bg-tertiary text-secondary')
+                }
+
+                $(btnSettle).on('click', () => {
+                    if (doc.data().appealStatus == 'Waiting') {
+                        settleAppeal(doc.id);
+                    }
+                })
+
+                $(btnSettleContainer).append(btnSettle);
+
+                $(header).append(detailsContainer).append(btnSettleContainer);
+
+                var body = $('<div>', { class: 'row' });
+                var name = $('<div>', { class: 'row form-label', text: 'Name of compliant: ' + doc.data().fullName });
+                var email = $('<div>', { class: 'row form-label', text: 'Email: ' + doc.data().email });
+                var contact = $('<div>', { class: 'row form-label', text: 'Contact Number: ' + doc.data().contact });
+                var comment = $('<div>', { class: 'row form-label', text: 'Comment: ' + doc.data().comment });
+
+                $(body).append(name).append(email).append(contact).append(comment);
+
+                $(row).append(header).append(body);
+
+                $('#appeal-container').append(row);
+            })
+        })
+    })
+</script>
+
+</html>

@@ -1,0 +1,104 @@
+:root {
+    --primary: #B08C61;
+    --secondary: #44352e;
+    --tertiary: #bbb7b4;;
+}
+
+.bg-primary {
+    background: var(--primary) !important;
+}
+
+.bg-secondary {
+    background: var(--secondary) !important;
+}
+
+.bg-red {
+    background-color: red;
+}
+
+.bg-blue {
+    background-color: blue;
+}
+
+.bg-green {
+    background-color: green;
+}
+
+.border-blue {
+    border: solid blue; 
+}
+
+.height-1000 {
+    height: 1000px;
+}
+
+.spacer-10 {
+    height: 10px;
+}
+
+.spacer-20 {
+    height: 20px;
+}
+
+.spacer-50 {
+    height: 50px;
+}
+
+.text-color-primary {
+    color: var(--primary);
+}
+
+.text-color-secondary {
+    color: var(--secondary);
+}
+
+.text-color-tertiary {
+    color: var(--tertiary);
+}
+
+.minHeight-adjust {
+    min-height: calc(100vh - 50px - 120px);
+}
+
+/* Buttons */
+
+.button-primary {
+    background-color: var(--primary);
+    color: white;
+    font-family: Montserrat;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 5px 25px;
+    width: 330px;
+    background-color: var(--secondary);
+    height: 81px;
+    font-size: 25px;
+    border-radius: 50px;
+}
+
+.button-primary:hover {
+    background-color: var(--primary);
+}
+
+.button-primary:active {
+    opacity: 75%;
+}
+
+.button-paymentMethod {
+    height: 48px;
+}
+
+.button-paymentMethod img {
+    height: 24px;
+}
+
+.button-red {
+    background-color: rgb(117, 0, 0);
+}
+
+/* Dividers */
+.divider {
+    min-height: 30px;
+    background-color: #eeedec;
+    color: rgba(44, 61, 57, 1);
+}
